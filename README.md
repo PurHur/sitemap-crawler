@@ -1,6 +1,8 @@
 # sitemap-crawler
 Sitemap crawler/generator. For given URL it will return sitemap XML file.
 
+Fork of ivebe/sitemap-crawler with some crazy helping hacks :)
+
 ## Install
 ```sh
 composer require ivebe/sitemap-crawler

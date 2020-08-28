@@ -22,6 +22,11 @@ class SitemapService
      */
     private $depth;
 
+    /**
+    * @var counts the exported links for statistics
+    */
+    private $exportCounter;
+
     public function __construct(ICrawler $crawler, ILinkCollection $collection)
     {
         $this->crawler    = $crawler;
@@ -99,6 +104,8 @@ class SitemapService
             $output .= '<loc>' . $link['url'] . '</loc>' . PHP_EOL;
             $output .= '<changefreq>' . $changefreq . '</changefreq>' . PHP_EOL;
             $output .= '</url>' . PHP_EOL;
+
+	    $this->exportCounter++;
         }
 
         $output .= '</urlset>';
@@ -114,5 +121,10 @@ class SitemapService
         }
 
         file_put_contents($saveToFile, $output);
+    }
+
+
+    public function getExportCounter() {
+	return $this->exportCounter;
     }
 }

@@ -54,6 +54,8 @@ class Crawler implements ICrawler
      */
     private function fetch($url)
     {
+        $ckfile = tempnam("/srv/www/kurse.bikmed.invorbereitung.de/temp", "CURLCOOKIE");
+        
         $options = [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_USERAGENT      => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
@@ -64,12 +66,17 @@ class Crawler implements ICrawler
             CURLOPT_AUTOREFERER    => true,
             CURLOPT_CONNECTTIMEOUT => 60,
             CURLOPT_TIMEOUT        => 60,
-            CURLOPT_MAXREDIRS      => 10
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_COOKIESESSION  => true,
+            CURLOPT_COOKIEFILE     => $ckfile
         ];
 
         $ch = curl_init( $url );
         curl_setopt_array( $ch, $options );
         $content = curl_exec( $ch );
+        if ($content === false) {
+            //throw new \Exception(curl_error($ch).': '.$url, curl_errno($ch));
+        }
         curl_close( $ch );
 
         return $content;
@@ -87,15 +94,7 @@ class Crawler implements ICrawler
         @$dom->loadHTML($this->fetch($url));
 
         $xPath = new \DOMXPath($dom);
-
-		if(isset($this->config['ignore_nofollow']) && $this->config['ignore_nofollow'] === true) {
-			$query = "//a[not(@rel) or @rel!='nofollow']/@href";
-		}
-		else {
-			$query = "//a/@href";
-		} 
-
-        $elements = $xPath->query($query);
+        $elements = $xPath->query("//a/@href");
 
 
         foreach ($elements as $e)
